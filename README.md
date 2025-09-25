@@ -1,20 +1,18 @@
-# 🎭 AI Poem Generator - Backend
+# AI Poem Generator - Backend
 
-A powerful FastAPI backend for generating beautiful poems using OpenAI's GPT models.
+This is the FastAPI backend for the AI Poem Generator application.
 
-## 🚀 Setup
+## Setup
 
-1. Clone this repository:
+1. Navigate to the backend directory:
    ```bash
-   git clone https://github.com/vaishnavipawar2854/AI_Poem_Generator_Backend.git
-   cd AI_Poem_Generator_Backend
+   cd backend
    ```
 
 2. Create a virtual environment:
    ```bash
    python -m venv poem_env
    poem_env\Scripts\activate  # On Windows
-   # source poem_env/bin/activate  # On macOS/Linux
    ```
 
 3. Install dependencies:
@@ -22,11 +20,7 @@ A powerful FastAPI backend for generating beautiful poems using OpenAI's GPT mod
    pip install -r requirements.txt
    ```
 
-4. Create a `.env` file based on `.env.example` and add your OpenAI API key:
-   ```bash
-   cp .env.example .env
-   # Edit .env file and add your OPENAI_API_KEY
-   ```
+4. Create a `.env` file based on `.env.example` and add your OpenAI API key.
 
 5. Run the server:
    ```bash
