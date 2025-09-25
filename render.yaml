@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ai-poem-generator-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: FRONTEND_URL
+        value: https://your-frontend-domain.onrender.com
+    healthCheckPath: /health
+    autoDeploy: true
