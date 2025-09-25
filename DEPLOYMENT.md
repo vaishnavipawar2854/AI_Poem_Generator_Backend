@@ -70,6 +70,50 @@ uvicorn app.main:app --host 0.0.0.0 --port $PORT
 - Ensure Python version compatibility
 - Review build logs for specific errors
 
+##### Error: "Preparing metadata (pyproject.toml)" / "maturin" / "cargo" failures
+
+If you see errors mentioning `maturin`, `cargo`, or `metadata-generation-failed` during the build (often referencing `pyproject.toml`), this usually means pip attempted to build a Rust-based wheel from source (for example `pydantic-core`). On Render's build environment this can fail due to missing Rust toolchain or read-only filesystem issues.
+
+Workarounds:
+
+- Prefer binary wheels so pip doesn't try to build from source. Update your `render.yaml` build command to upgrade build tools and install with `--prefer-binary`:
+
+   ```yaml
+   buildCommand: >
+      pip install --upgrade pip setuptools wheel
+      pip install --prefer-binary --no-cache-dir -r requirements.txt
+   ```
+
+- Alternatively, pin packages to versions that have prebuilt wheels for your Python version, or add a `pyproject.toml`/`setup.py` so pip can use prebuilt metadata.
+
+- If your dependency strictly requires building native extensions, add a pre-build step to install Rust toolchain — but this is generally discouraged on Render's free containers.
+
+These changes are already applied in the `render.yaml` in this repository and should avoid invoking maturin/cargo during install.
+
+##### Additional workaround: read-only Cargo cache errors
+
+If the logs show errors like `failed to create directory '/usr/local/cargo/registry/cache...'` or `Read-only file system (os error 30)`, instruct the build to use writable temporary CARGO/RUSTUP locations. The `render.yaml` in this repo now creates `/tmp/.cargo` and `/tmp/.rustup` and sets `CARGO_HOME` and `RUSTUP_HOME` accordingly before running pip. That prevents maturin/cargo from trying to write to system-owned paths.
+
+Example build snippet already used in this repo's `render.yaml`:
+
+```yaml
+buildCommand: >
+   mkdir -p /tmp/.cargo /tmp/.rustup
+   export CARGO_HOME=/tmp/.cargo
+   export RUSTUP_HOME=/tmp/.rustup
+   pip install --upgrade pip setuptools wheel
+   pip install --prefer-binary --no-cache-dir -r requirements.txt
+```
+
+Persistent env-vars alternative
+
+If the transient `export` approach still fails in your Render build environment, add persistent environment variables in the Render dashboard under the service's Environment section:
+
+- `CARGO_HOME` = `/tmp/.cargo`
+- `RUSTUP_HOME` = `/tmp/.rustup`
+
+This ensures any subprocess (like `maturin` invoked by pip) uses writable cache locations and avoids attempts to write under `/usr/local/cargo` which is read-only on Render's containers.
+
 #### Service Won't Start
 - Verify `OPENAI_API_KEY` is set correctly
 - Check that the start command matches your app structure
