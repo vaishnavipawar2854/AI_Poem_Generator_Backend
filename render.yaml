@@ -1,10 +1,8 @@
 services:
   - type: web
     name: ai-poem-generator-backend
-    runtime: python
-    buildCommand: >
-      mkdir -p /tmp/.cargo /tmp/.rustup && export CARGO_HOME=/tmp/.cargo && export RUSTUP_HOME=/tmp/.rustup && pip install --upgrade pip setuptools wheel && pip install --prefer-binary --no-cache-dir -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    runtime: docker
+    dockerfilePath: Dockerfile
     plan: free
     envVars:
       - key: ENV
@@ -13,9 +11,5 @@ services:
         value: 0.0.0.0
       - key: FRONTEND_URL
         value: https://your-frontend-domain.onrender.com
-      - key: CARGO_HOME
-        value: /tmp/.cargo
-      - key: RUSTUP_HOME
-        value: /tmp/.rustup
     healthCheckPath: /health
     autoDeploy: true

@@ -114,6 +114,10 @@ If the transient `export` approach still fails in your Render build environment,
 
 This ensures any subprocess (like `maturin` invoked by pip) uses writable cache locations and avoids attempts to write under `/usr/local/cargo` which is read-only on Render's containers.
 
+Recommended Python runtime
+
+To maximize the chance of pip selecting prebuilt wheels (and avoid building native/Rust extensions), set the Render service runtime to Python 3.11 (if available). Many packages publish wheels for 3.11; using the same minor Python version locally and in Render reduces compatibility issues.
+
 #### Service Won't Start
 - Verify `OPENAI_API_KEY` is set correctly
 - Check that the start command matches your app structure
